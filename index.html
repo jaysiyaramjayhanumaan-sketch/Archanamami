@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+ 
+ <title>Wisdom Library - Splash</title>
+
+  <!-- Google fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Raleway:wght@300;600&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- jsPDF Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+<h1>Welcome To Wisdom Library</h1>
+  <!-- Splash Screen -->
+ <div id="splashScreen">
+  <div id="splashText"></div>       <!-- ऊपर वाला टेक्स्ट -->
+  <div id="splashSubText"></div>    <!-- नीचे वाला टेक्स्ट -->
+  <img id="splashPhoto" src="photo.jpg.jpg" alt="Your Photo">
+  <audio id="splashSound" src="gunshot.mp3" preload="auto"></audio>
+</div>
+
+
+
+  <!-- Actual App -->
+  <div id="mainApp" style="display: none;">
+    <!-- ... yahan aapka existing content jo aapne diya hai ... -->
+  </div>
+
+  
+
+
+      <!-- Control buttons -->
+    <div class="top-controls">
+      <div class="left-controls">
+  <button onclick="showNotifications()" style="margin-bottom:10px;">Show Fee Alerts</button>  
+<button onclick="updateOverdueRemarks()">Mark Overdues</button>
+
+  <button class="backup-btn">Backup</button>
+  <button class="restore-btn">Restore</button>
+  <button onclick="downloadPDF()" style="margin-left:10px; background:#0066CC; color:#fff; padding:6px 12px; border:none; border-radius:6px; cursor:pointer;">
+    📄 Download PDF
+  </button>
+</div>
+
+      <div class="right-controls">
+        <button id="showFilledBtn">Show Filled Seats</button>
+        <button id="showEmptyBtn">Show Empty Seats</button>
+        <button id="showAllBtn" style="display:none;">Show All Seats</button>
+      </div>
+    </div>
+<!-- ⬇⬇ यह नया alert container ⬇⬇ -->
+<div class="alerts-card" id="alertsCard">
+  <div class="alerts-head">
+    <strong>Alerts</strong>
+    <button id="closeBoxBtn" title="Close Box">×</button>  <!-- नया बटन -->
+  </div>
+  <div id="alertsList" class="alerts-list"></div>
+  <div class="alert-controls">
+    <button id="scrollBtn" class="to-bottom" title="Scroll to bottom">↓</button>
+    <button id="closeAllBtn" title="Close All">Close All</button>
+  </div>
+</div>
+
+<!-- ⬆⬆ यह नया alert container ⬆⬆ -->
+
+
+    <div id="searchContainer" style="margin: 10px 0;">
+      <div class="search-controls">
+        <select id="searchType">
+          <option value="name">By Name</option>
+          <option value="seatNo">By Seat No</option>
+        </select>
+        <input id="searchInput" placeholder="Enter name" />
+        <button id="searchBtn">🔍 Search</button>
+        <button id="clearSearchBtn" style="display: none;">🔙 Back to All Seats</button>
+      </div>
+      <div id="searchResult"></div>
+    </div>
+
+    <div class="grid" id="seatGrid"></div>
+
+    <!-- Modal -->
+    <div class="modal" id="editModal">
+      <div class="modal-content">
+        <h3>Edit Seat</h3>
+        <input type="text" id="editName" placeholder="Name">
+        <input type="text" id="editMobile" placeholder="Mobile">
+        <label for="editAdmissionDate">Admission Date</label>
+        <input type="date" id="editAdmissionDate">
+        <input type="number" id="editMonths" placeholder="Months">
+        <label for="editDueDate">Due Date</label>
+        <input type="date" id="editDueDate" readonly>
+        <input type="number" id="editFees" placeholder="Fees">
+
+<!-- ✅ Add these new fields -->
+<input type="number" id="editOutstanding" placeholder="Outstanding">
+<textarea id="editRemark" placeholder="Remark" rows="2" style="margin-top: 8px;"></textarea>
+
+<input type="file" id="editPhoto" accept="image/*">
+<img id="photoPreview" src="" alt="Preview" style="width: 100px; height: auto; margin-top: 10px;" />
+
+        <input type="file" id="editPhoto" accept="image/*">
+        <img id="photoPreview" src="" alt="Preview" style="width: 100px; height: auto; margin-top: 10px;" />
+        <button type="button" id="removePhotoBtn"
+                style="margin-top:8px; background:#ff4d4d; color:#fff; padding:6px 10px; border:none; border-radius:6px; cursor:pointer; display:block; width:100%;">
+          ❌ Remove Photo
+        </button>
+        <div class="button-group side-buttons">
+          <button class="edit-btn" onclick="saveSeat()">Save</button>
+          <button class="delete-btn" onclick="deleteSeat()">Delete</button>
+          <button onclick="closeModal()">Cancel</button>
+        </div>
+        <div class="edit-actions">
+          <a href="tel:" id="callBtn" class="call-btn">📞 Call</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+ 
+  <!-- Custom JS -->
+  <script src="script.js"></script>
+
+  <script>
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4"
+    });
+
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("Wisdom Library - Seat Report", doc.internal.pageSize.getWidth() / 2, 15, { align: "center" });
+
+    // 🟡 Sorting all seats by seatNo (optional but useful)
+    const sortedSeats = [...seats].sort((a, b) => parseInt(a.seatNo) - parseInt(b.seatNo));
+
+    // 🟢 Prepare table rows (all seats, filled or blank)
+    const rows = sortedSeats.map(s => [
+      s.seatNo || "",
+      s.name || "",
+      s.mobile || "",
+      formatDate(s.admissionDate),
+      s.months || "",
+      formatDate(s.dueDate),
+      s.fees || "",
+      s.outstanding || "",
+      s.remark || ""
+    ]);
+
+    doc.autoTable({
+      startY: 25,
+      head: [["Seat No", "Name", "Mobile", "Admission Date", "Months", "Due Date", "Fees", "Outstanding", "Remark"]],
+      body: rows,
+      theme: 'grid',
+      styles: { fontSize: 11, halign: 'center', font: "helvetica", fontStyle: "bold" },
+      headStyles: { fillColor: [0,102,204], textColor: [255,255,255], fontStyle: "bold", halign:'center' },
+      bodyStyles: { 
+  fontStyle: "bold",       // Bold font
+  textColor: [0, 0, 0]     // Pure black color
+},
+
+      alternateRowStyles: { fillColor: [240,240,240] },
+      columnStyles: {
+        1: { halign: 'left' }  // Name column left aligned
+      },
+// 🟥 Highlight specific columns: Remark (8) and Outstanding (7)
+  didParseCell: function (data) {
+    const colIndex = data.column.index;
+    const section = data.section; // 'body' or 'head'
+
+    if (section === 'body') {
+      if (colIndex === 7 || colIndex === 8) { // 7 = Outstanding, 8 = Remark
+        data.cell.styles.textColor = [255, 0, 0]; // Red color
+        data.cell.styles.fontStyle = 'bold';
+      }
+    }
+  },
+      didDrawPage: function (data) {
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageCurrent = data.pageNumber;
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Page ${pageCurrent} of ${pageCount}`, pageWidth / 2, pageHeight - 5, { align: "center" });
+      }
+    });
+
+    // 🟢 Count filled seats (name is not empty)
+const filledSeats = seats.filter(s => s.name && s.name.trim() !== "");
+const totalFilled = filledSeats.length;
+
+// 🟢 Sum of fees from filled seats
+const totalFees = filledSeats.reduce((sum, s) => sum + (parseFloat(s.fees) || 0), 0);
+
+// 🟢 Sum of outstanding from filled seats
+const totalOutstanding = filledSeats.reduce((sum, s) => sum + (parseFloat(s.outstanding) || 0), 0);
+
+// 🟢 Show summary in PDF
+doc.autoTable({
+  startY: doc.lastAutoTable.finalY + 10,
+  body: [
+    ["", "", "", "", "Total Seats Filled:", totalFilled],
+    ["", "", "", "", "Total Fees Collected:", "Rs. " + totalFees],
+    ["", "", "", "", "Total Outstanding:", "Rs. " + totalOutstanding]
+  ],
+  theme: 'plain',
+  styles: { fontSize: 12, fontStyle: "bold", halign: 'right' },
+  columnStyles: {
+    4: { halign: 'right', textColor: [0, 102, 204] },
+    5: { halign: 'center', textColor: [0, 102, 204] }
+  }
+});
+
+
+    // 🟢 Download or pass to Android
+    const pdfBase64 = doc.output("datauristring");
+    if (window.AndroidBridge && window.AndroidBridge.savePdfFromBase64) {
+      window.AndroidBridge.savePdfFromBase64(pdfBase64);
+    } else {
+      doc.save("SeatReport.pdf");
+    }
+  }
+
+
+
+  // Helper: format date
+  function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d)) return "";
+
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = d.toLocaleString('en-IN', { month: 'long' }); // Full month name
+  const year = d.getFullYear().toString().slice(-2); // Last 2 digits of year
+
+  return `${day}-${month}-${year}`;
+}
+
+</script>
+
+</body>
+</html>
