@@ -212,22 +212,30 @@ function updateDueDate(){
     }
 }
 function updateOverdueRemarks() {
-    let today = new Date();
-    today.setHours(0, 0, 0, 0); // ignore time part
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     for (let i = 0; i < seats.length; i++) {
-        let seat = seats[i];
+        const seat = seats[i];
         if (seat.dueDate) {
-            let due = new Date(seat.dueDate);
+            const due = new Date(seat.dueDate);
             due.setHours(0, 0, 0, 0);
+
             if (due < today) {
-                seat.remark = "Overdue";
+                // ✅ सिर्फ तभी overwrite करे जब remark खाली हो
+                if (!seat.remark || seat.remark.trim() === "") {
+                    seat.remark = "Overdue";
+                }
             } else {
-                seat.remark = ""; // Optional: clear remark if not overdue
+                // ✅ अगर पहले auto "Overdue" था, तो हटा दे
+                if (seat.remark === "Overdue") {
+                    seat.remark = "";
+                }
             }
         }
     }
 }
+
 
 
 
@@ -245,12 +253,13 @@ function saveSeat(){
     seat.months = document.getElementById('editMonths').value;
     seat.fees = document.getElementById('editFees').value;
     seat.dueDate = document.getElementById('editDueDate').value;
-updateDueDate();  // calculate dueDate just before saving
+
 seat.dueDate = document.getElementById('editDueDate').value;
 
     seat.outstanding = document.getElementById('editOutstanding').value;
     seat.remark = document.getElementById('editRemark').value.trim();
     seat.photo = document.getElementById('photoPreview').src;
+updateDueDate();  // calculate dueDate just before saving
 
     // ✅ Debug line
     console.log("Photo saved for seat " + seat.seatNo, seat.photo);
