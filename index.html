@@ -16,6 +16,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
+<script>
+  function clearField(id) {
+    const input = document.getElementById(id);
+    if (input) input.value = "";
+  }
+</script>
+
 <body>
 <h1>Welcome To Wisdom Library</h1>
   <!-- Splash Screen -->
@@ -93,10 +100,16 @@
         <input type="text" id="editName" placeholder="Name">
         <input type="text" id="editMobile" placeholder="Mobile">
         <label for="editAdmissionDate">Admission Date</label>
+        <div style="display:flex;align-items:center;gap:6px;">
         <input type="date" id="editAdmissionDate">
+        <button type="button" onclick="clearField('editAdmissionDate')">❌</button>
+</div>
         <input type="number" id="editMonths" placeholder="Months">
         <label for="editDueDate">Due Date</label>
+        <div style="display:flex;align-items:center;gap:6px;">
         <input type="date" id="editDueDate" readonly>
+        <button type="button" onclick="clearField('editDueDate')">❌</button>
+</div>
         <input type="number" id="editFees" placeholder="Fees">
 
 <!-- ✅ Add these new fields -->
