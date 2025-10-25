@@ -53,6 +53,9 @@
   <button class="restore-btn">Restore</button>
   <button onclick="downloadPDF()" style="margin-left:10px; background:#0066CC; color:#fff; padding:6px 12px; border:none; border-radius:6px; cursor:pointer;">
     📄 Download PDF
+  <button onclick="downloadOverduePDF()" 
+  style="margin-left:10px; background:#CC0000; color:#fff; padding:6px 12px; border:none; border-radius:6px; cursor:pointer;">
+  ⚠️ Download Overdue Report
   </button>
 </div>
 
@@ -115,6 +118,8 @@
 <!-- ✅ Add these new fields -->
 <input type="number" id="editOutstanding" placeholder="Outstanding">
 <textarea id="editRemark" placeholder="Remark" rows="2" style="margin-top: 8px;"></textarea>
+
+
 
         <input type="file" id="editPhoto" accept="image/*">
         <img id="photoPreview" src="" alt="Preview" style="width: 100px; height: auto; margin-top: 10px;" />
@@ -257,8 +262,97 @@ doc.autoTable({
   return `${day}-${month}-${year}`;
 }
 
+function downloadOverduePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: "landscape",
+    unit: "mm",
+    format: "a4"
+  });
+
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  doc.text("Wisdom Library - Overdue Students Report", doc.internal.pageSize.getWidth() / 2, 15, { align: "center" });
+
+  const today = new Date();
+  
+  // 🟢 Filter only overdue students (filled seats with due date passed)
+  const overdueSeats = seats.filter(s => {
+    if (!s.name || !s.dueDate) return false;
+    const due = new Date(s.dueDate);
+    return due < today; // due date is before today
+  });
+
+  if (overdueSeats.length === 0) {
+    alert("No overdue students found!");
+    return;
+  }
+
+  // 🟡 Sort by how overdue they are (descending)
+  const sorted = [...overdueSeats].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+  // 🟢 Prepare data for PDF table
+  const rows = sorted.map(s => {
+    const due = new Date(s.dueDate);
+    const diffDays = Math.floor((today - due) / (1000 * 60 * 60 * 24)); // difference in days
+    return [
+      s.seatNo || "",
+      s.name || "",
+      s.mobile || "",
+      formatDate(s.dueDate),
+      diffDays + " days"
+    ];
+  });
+
+  // 🟢 Create table
+  doc.autoTable({
+    startY: 25,
+    head: [["Seat No", "Name", "Mobile", "Due Date", "Overdue Days"]],
+    body: rows,
+    theme: 'grid',
+    styles: { fontSize: 11, halign: 'center', font: "helvetica", fontStyle: "bold" },
+    headStyles: { fillColor: [204,0,0], textColor: [255,255,255], fontStyle: "bold" },
+    bodyStyles: { fontStyle: "bold" },
+    didParseCell: function (data) {
+      if (data.section === 'body' && data.column.index === 4) {
+        data.cell.styles.textColor = [255, 0, 0];
+        data.cell.styles.fontStyle = 'bold';
+      }
+    },
+    didDrawPage: function (data) {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const pageCount = doc.internal.getNumberOfPages();
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Page ${data.pageNumber} of ${pageCount}`, pageWidth / 2, pageHeight - 5, { align: "center" });
+    }
+  });
+
+  // 🟢 Summary at the end
+  doc.autoTable({
+    startY: doc.lastAutoTable.finalY + 10,
+    body: [
+      ["", "", "Total Overdue Students:", overdueSeats.length]
+    ],
+    theme: 'plain',
+    styles: { fontSize: 12, fontStyle: "bold", halign: 'right' },
+    columnStyles: {
+      2: { halign: 'right', textColor: [204, 0, 0] },
+      3: { halign: 'center', textColor: [204, 0, 0] }
+    }
+  });
+
+  // 🟢 Download or send to Android
+  const pdfBase64 = doc.output("datauristring");
+  if (window.AndroidBridge && window.AndroidBridge.savePdfFromBase64) {
+    window.AndroidBridge.savePdfFromBase64(pdfBase64);
+  } else {
+    doc.save("OverdueReport.pdf");
+  }
+}
 </script>
+
 
 </body>
 </html>
-
