@@ -243,8 +243,11 @@ doc.autoTable({
     if (window.AndroidBridge && window.AndroidBridge.savePdfFromBase64) {
       window.AndroidBridge.savePdfFromBase64(pdfBase64);
     } else {
-      doc.save("SeatReport.pdf");
-    }
+      // ✅ Open PDF in new tab
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
   }
 
 
@@ -348,8 +351,11 @@ function downloadOverduePDF() {
   if (window.AndroidBridge && window.AndroidBridge.savePdfFromBase64) {
     window.AndroidBridge.savePdfFromBase64(pdfBase64);
   } else {
-    doc.save("OverdueReport.pdf");
-  }
+     // ✅ Open PDF in new tab
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
 }
 </script>
 
