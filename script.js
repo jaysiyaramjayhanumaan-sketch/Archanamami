@@ -210,6 +210,11 @@ function updateDueDate(){
             document.getElementById('editRemark').value = "";
         }
     }
+ // 👇 Automatically open calendar when updating due date
+    const dueDateInput = document.getElementById('editDueDate');
+    if (dueDateInput.showPicker) {
+        dueDateInput.showPicker();
+    }
 }
 function updateOverdueRemarks() {
     const today = new Date();
