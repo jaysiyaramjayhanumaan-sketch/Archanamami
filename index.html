@@ -110,7 +110,8 @@
         <input type="number" id="editMonths" placeholder="Months">
         <label for="editDueDate">Due Date</label>
         <div style="display:flex;align-items:center;gap:6px;">
-        <input type="date" id="editDueDate" readonly>
+        <input type="date" id="editDueDate" onclick="this.showPicker()" onchange="checkOverdue()">
+
         <button type="button" onclick="clearField('editDueDate')">❌</button>
 </div>
         <input type="number" id="editFees" placeholder="Fees">
