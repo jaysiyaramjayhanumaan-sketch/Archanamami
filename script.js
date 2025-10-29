@@ -383,7 +383,7 @@ function openSMS(number, name, dueDateStr) {
 
     let message;
    if (dueDays > 5) {
-    message = `📚 *Wisdom Library Reminder*\n\nHi ${name} 👋\n\nHope you're doing great! 🌼\nYour library fee has been *overdue since ${formattedDueDate} (${dueDays} days ago).* \n\nPlease contact us at your convenience to confirm your plan for payment. 📞\n\nThank you for being a valued member of *Wisdom Library* 💫\n\n☎️ Call us: +91-9425373085\n\nWarm regards,\nTeam Wisdom Library`;
+    message = `📚 *Wisdom Library Alert!*\n\nHi ${name} 👋\n\nHope you're doing great! 🌼\nThis is a friendly reminder that your library fee has been *overdue since ${formattedDueDate} (${dueDays} days ago).* \n\nPlease contact us at your convenience to confirm your plan for payment 📞. \n\nWe’d love to hear from you about your payment plan 💌.\n\nThank you for being a valued member of *Wisdom Library* 💫\n\n☎️ Call us: +91-9425373085\n\nWarm regards,\nTeam Wisdom Library`;
 
 } else {
     message = `📚 *Wisdom Library Reminder*\n\nHello ${name} 👋\n\nYour library fee was due on *${formattedDueDate}* (${dueDays} day${dueDays !== 1 ? 's' : ''} ago).\n\nPlease settle it at the earliest to keep enjoying our library services. 💫\n\nThank you for being a valued member of *Wisdom Library*.\n\n☎️ Call us: +91-9425373085\n\n_Warm regards,_\n*Team Wisdom Library*`;
@@ -426,9 +426,9 @@ function openWhatsApp(number, name, dueDateStr) {
     // Conditional message
     let message;
     if (dueDays > 5) {
-        message = `📚 *Wisdom Library Reminder*\n\nHi ${name} 👋\n\nHope you're doing great! 🌼\nYour library fee has been *overdue since ${formattedDueDate} (${dueDays} days ago).* \n\nPlease contact us at your convenience to confirm your plan for payment. 📞\n\nThank you for being a valued member of *Wisdom Library* 💫\n\n☎️ Call us: +91-9425373085\n\nWarm regards,\nTeam Wisdom Library`;
+        message = `📚 *Wisdom Library Alert!*\n\nHi ${name} 👋\n\nHope you're doing great! 🌼\nThis is a friendly reminder that your library fee has been *overdue since ${formattedDueDate} (${dueDays} days ago).* \n\nPlease contact us at your convenience to confirm your plan for payment 📞. \n\nWe’d love to hear from you about your payment plan 💌.\n\nThank you for being a valued member of *Wisdom Library* 💫\n\n☎️ Call us: +91-9425373085\n\nWarm regards,\nTeam Wisdom Library`;
 
-    } else {
+} else {
         message = `📚 *Wisdom Library Reminder*\n\nHello ${name} 👋\n\nYour library fee was due on *${formattedDueDate}* (${dueDays} day${dueDays !== 1 ? 's' : ''} ago).\n\nPlease settle it at the earliest to keep enjoying our library services. 💫\n\nThank you for being a valued member of *Wisdom Library*.\n\n☎️ Call us: +91-9425373085\n\n_Warm regards,_\n*Team Wisdom Library*`;
 
     }
