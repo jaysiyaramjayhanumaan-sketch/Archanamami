@@ -381,13 +381,20 @@ function openSMS(number, name, dueDateStr) {
 
     const formattedDueDate = `${String(dueDate.getDate()).padStart(2, '0')}-${dueDate.toLocaleString('en-US', { month: 'short' })}-${dueDate.getFullYear()}`;
 
-    let message;
-   if (dueDays > 5) {
-    message = `📚 *Wisdom Library Alert!*\n\nHi ${name} 👋\n\nHope you're doing great! 🌼\nThis is a friendly reminder that your library fee has been *overdue since ${formattedDueDate} (${dueDays} days ago).* \n\nPlease contact us at your convenience to confirm your plan for payment 📞. \n\nWe’d love to hear from you about your payment plan 💌.\n\nThank you for being a valued member of *Wisdom Library* 💫\n\n☎️ Call us: +91-9425373085\n\nWarm regards,\nTeam Wisdom Library`;
+   // Conditional message
+let message;
+
+if (dueDays > 10) {
+    // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
+    message = `📢 *Fees Overdue Notice — Wisdom Library*\n\nDear ${name},\n\nYour library fee has been *overdue since ${formattedDueDate}* — it’s now been *${dueDays} days*. 📅\n\nWe’ve noticed that your payments have often been delayed, and we’re genuinely concerned. Could you please let us know the reason behind this repeated delay? 🤔\n\nWe don’t like having to remind you again and again — it’s uncomfortable for us too. Please take a moment to respond to this message and make your payment *today itself* to avoid any further inconvenience.\n\nWe truly value your association with *Wisdom Library* and hope to continue serving you with the same warmth and trust. 💫\n\n☎️ *Call/WhatsApp:* +91-9425373085\n\n_Kind regards,_\n*Team Wisdom Library* 📚`;
+
+} else if (dueDays > 5) {
+    // NORMAL REMINDER (friendly but serious)
+    message = `📚 *Wisdom Library Alert!*\n\nHi ${name} 👋\n\nHope you're doing great! 🌼\nThis is a friendly reminder that your library fee has been *overdue since ${formattedDueDate} (${dueDays} days ago).* \n\nPlease contact us at your convenience to confirm your plan for payment 📞.\n\nWe’d love to hear from you about your payment plan 💌.\n\nThank you for being a valued member of *Wisdom Library* 💫\n\n☎️ Call us: +91-9425373085\n\nWarm regards,\nTeam Wisdom Library`;
 
 } else {
+    // LIGHT REMINDER (gentle tone)
     message = `📚 *Wisdom Library Reminder*\n\nHello ${name} 👋\n\nYour library fee was due on *${formattedDueDate}* (${dueDays} day${dueDays !== 1 ? 's' : ''} ago).\n\nPlease settle it at the earliest to keep enjoying our library services. 💫\n\nThank you for being a valued member of *Wisdom Library*.\n\n☎️ Call us: +91-9425373085\n\n_Warm regards,_\n*Team Wisdom Library*`;
-
 }
 
 
@@ -424,14 +431,20 @@ function openWhatsApp(number, name, dueDateStr) {
     const formattedDueDate = `${String(dueDate.getMonth() + 1).padStart(2, '0')}-${String(dueDate.getDate()).padStart(2, '0')}-${dueDate.getFullYear()}`;
 
     // Conditional message
-    let message;
-    if (dueDays > 5) {
-        message = `📚 *Wisdom Library Alert!*\n\nHi ${name} 👋\n\nHope you're doing great! 🌼\nThis is a friendly reminder that your library fee has been *overdue since ${formattedDueDate} (${dueDays} days ago).* \n\nPlease contact us at your convenience to confirm your plan for payment 📞. \n\nWe’d love to hear from you about your payment plan 💌.\n\nThank you for being a valued member of *Wisdom Library* 💫\n\n☎️ Call us: +91-9425373085\n\nWarm regards,\nTeam Wisdom Library`;
+let message;
+
+if (dueDays > 10) {
+    // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
+    message = `📢 *Fees Overdue Notice — Wisdom Library*\n\nDear ${name},\n\nYour library fee has been *overdue since ${formattedDueDate}* — it’s now been *${dueDays} days*. 📅\n\nWe’ve noticed that your payments have often been delayed, and we’re genuinely concerned. Could you please let us know the reason behind this repeated delay? 🤔\n\nWe don’t like having to remind you again and again — it’s uncomfortable for us too. Please take a moment to respond to this message and make your payment *today itself* to avoid any further inconvenience.\n\nWe truly value your association with *Wisdom Library* and hope to continue serving you with the same warmth and trust. 💫\n\n☎️ *Call/WhatsApp:* +91-9425373085\n\n_Kind regards,_\n*Team Wisdom Library* 📚`;
+
+} else if (dueDays > 5) {
+    // NORMAL REMINDER (friendly but serious)
+    message = `📚 *Wisdom Library Alert!*\n\nHi ${name} 👋\n\nHope you're doing great! 🌼\nThis is a friendly reminder that your library fee has been *overdue since ${formattedDueDate} (${dueDays} days ago).* \n\nPlease contact us at your convenience to confirm your plan for payment 📞.\n\nWe’d love to hear from you about your payment plan 💌.\n\nThank you for being a valued member of *Wisdom Library* 💫\n\n☎️ Call us: +91-9425373085\n\nWarm regards,\nTeam Wisdom Library`;
 
 } else {
-        message = `📚 *Wisdom Library Reminder*\n\nHello ${name} 👋\n\nYour library fee was due on *${formattedDueDate}* (${dueDays} day${dueDays !== 1 ? 's' : ''} ago).\n\nPlease settle it at the earliest to keep enjoying our library services. 💫\n\nThank you for being a valued member of *Wisdom Library*.\n\n☎️ Call us: +91-9425373085\n\n_Warm regards,_\n*Team Wisdom Library*`;
-
-    }
+    // LIGHT REMINDER (gentle tone)
+    message = `📚 *Wisdom Library Reminder*\n\nHello ${name} 👋\n\nYour library fee was due on *${formattedDueDate}* (${dueDays} day${dueDays !== 1 ? 's' : ''} ago).\n\nPlease settle it at the earliest to keep enjoying our library services. 💫\n\nThank you for being a valued member of *Wisdom Library*.\n\n☎️ Call us: +91-9425373085\n\n_Warm regards,_\n*Team Wisdom Library*`;
+}
 
     // ✅ Open WhatsApp in new tab (more reliable)
     window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`, '_blank');
@@ -1110,6 +1123,7 @@ function openEditModal(seatNo) {
 
   document.getElementById("editModal").style.display = "block";
 }
+
 
 
 
