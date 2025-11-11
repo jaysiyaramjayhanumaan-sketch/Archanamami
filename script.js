@@ -381,7 +381,7 @@ function openSMS(number, name, dueDateStr) {
 
     const formattedDueDate = `${String(dueDate.getDate()).padStart(2, '0')}-${dueDate.toLocaleString('en-US', { month: 'short' })}-${dueDate.getFullYear()}`;
 
-    let message;
+     let message;
 
 if (dueDays > 10) {
     // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
@@ -403,8 +403,6 @@ if (dueDays > 10) {
     // VERY GENTLE REMINDER (1–3 days)
     message = `📚 *Wisdom Library Reminder*\n\nHello ${name} 👋\n\nआपकी लाइब्रेरी फीस *${formattedDueDate}* को ड्यू थी (आज से *${dueDays} दिन* पहले)। कोई बात नहीं — कभी-कभी थोड़ी देरी हो जाती है! 😊\n\nकृपया बता दें कि आप पेमेंट कब तक कर पाएंगे — ताकि हम रिकॉर्ड अपडेट रख सकें। 💬\n\n☎️ Call/WhatsApp: +91-9425373085\n\n_धन्यवाद एवं शुभकामनाएँ_,\n*Team Wisdom Library* 📚`;
 }
-
-
 
 
     const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
@@ -439,7 +437,8 @@ function openWhatsApp(number, name, dueDateStr) {
 
     const formattedDueDate = `${String(dueDate.getMonth() + 1).padStart(2, '0')}-${String(dueDate.getDate()).padStart(2, '0')}-${dueDate.getFullYear()}`;
 
-  let message;
+    // Conditional message
+    let message;
 
 if (dueDays > 10) {
     // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
@@ -461,7 +460,6 @@ if (dueDays > 10) {
     // VERY GENTLE REMINDER (1–3 days)
     message = `📚 *Wisdom Library Reminder*\n\nHello ${name} 👋\n\nJust letting you know your library fee was due on *${formattedDueDate}* (${dueDays} day${dueDays !== 1 ? 's' : ''} ago). No worries — we understand delays happen! 😊\n\nCould you please confirm when you’ll be able to make the payment? Your response helps us keep records up to date. 💬\n\n☎️ Call/WhatsApp: +91-9425373085\n\n_Warm regards,_\n*Team Wisdom Library* 📚`;
 }
-
 
     // ✅ Open WhatsApp in new tab (more reliable)
     window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`, '_blank');
@@ -957,7 +955,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const splashText = document.getElementById("splashText");
   const splashSubText = document.getElementById("splashSubText");
-  
+  const splashSound = document.getElementById("splashSound");
   const splashScreen = document.getElementById("splashScreen");
   const mainApp = document.getElementById("mainApp");
 
@@ -985,7 +983,8 @@ document.addEventListener("DOMContentLoaded", function () {
   spansMain.forEach((span, i) => {
     setTimeout(() => {
       span.classList.add("visible");
-      
+      splashSound.currentTime = 0;
+      splashSound.play();
     }, i * 200); // delay between letters
   });
 
@@ -993,7 +992,8 @@ document.addEventListener("DOMContentLoaded", function () {
   spansSub.forEach((span, i) => {
     setTimeout(() => {
       span.classList.add("visible");
-      
+      splashSound.currentTime = 0;
+      splashSound.play();
     }, (spansMain.length * 200) + (i * 200));
   });
 
