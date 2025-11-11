@@ -1355,6 +1355,91 @@ span.visible {
 .sms-btn:hover {
     opacity: 0.9;
 }
+<style>
+/* Common style for all buttons */
+button {
+  background: #0066CC;
+  color: #fff;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 160px;    /* 👈 fixed width (aap change kar sakte ho) */
+  height: 40px;    /* 👈 fixed height (uniform height) */
+  box-sizing: border-box;
+}
+
+/* Hover effect */
+button:hover {
+  opacity: 0.9;
+}
+
+/* Red (Overdue) button ka color alag ho to */
+button[onclick="downloadOverduePDF()"] {
+  background: #CC0000;
+}
+
+/* Backup & Restore buttons ka thoda different color */
+.backup-btn {
+  background: #009900;
+}
+.restore-btn {
+  background: #FF9900;
+}
+
+/* Optional: spacing control */
+button {
+  margin: 5px;
+}
+</style>
+<style>
+/* Common style for all buttons */
+button {
+  background: #0066CC;          /* Default blue */
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;           /* 👈 Rounded corners — same shape */
+  width: 160px;                 /* 👈 Same width */
+  height: 42px;                 /* 👈 Same height */
+  cursor: pointer;
+  box-sizing: border-box;
+  display: inline-flex;          /* 👈 Centers emoji + text properly */
+  align-items: center;
+  justify-content: center;
+  gap: 6px;                      /* Space between emoji & text */
+  margin: 5px;
+  transition: 0.2s;
+}
+
+/* Hover effect */
+button:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+/* Specific colors for special buttons */
+button[onclick="downloadOverduePDF()"] {
+  background: #CC0000;
+}
+
+.backup-btn {
+  background: #009900;
+}
+
+.restore-btn {
+  background: #FF9900;
+}
+
+/* Optional: Make container buttons line up nicely */
+div button {
+  vertical-align: middle;
+}
+</style>
+
+
 
 
 
