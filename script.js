@@ -289,14 +289,36 @@ function downloadBlob(blob, filename) {
 
 
 // Delete seat
-function deleteSeat(){
-    if(confirm("Are you sure you want to delete this seat's data?")){
-        seats[editIndex] = { seatNo: seats[editIndex].seatNo, name: "", mobile: "", admissionDate: "", months: "", dueDate: "", fees: "", photo: "" };
+function deleteSeat() {
+    if (confirm("Are you sure you want to delete this seat's data?")) {
+
+        // Seat fields reset
+        seats[editIndex] = { 
+            seatNo: seats[editIndex].seatNo, 
+            name: "", 
+            mobile: "", 
+            admissionDate: "", 
+            months: "", 
+            dueDate: "", 
+            fees: "", 
+            photo: "",
+            outstanding: "",
+            remark: ""
+        };
+
+        // Save update
         localStorage.setItem("seats", JSON.stringify(seats));
+
         closeModal();
         renderSeats();
+
+        // 🔥 Search result तुरंत साफ हो जाए
+        document.getElementById("searchResult").innerHTML = "";
+        document.getElementById("searchInput").value = "";
+        document.getElementById("clearSearchBtn").style.display = "none";
     }
 }
+
 
 // Close modal
 function closeModal(){
@@ -1138,6 +1160,7 @@ function openEditModal(seatNo) {
 
   document.getElementById("editModal").style.display = "block";
 }
+
 
 
 
