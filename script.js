@@ -405,7 +405,31 @@ function openSMS(number, name, dueDateStr) {
 
      let message;
 
-if (dueDays > 10) {
+if (dueDays > 11) {
+    // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
+    message = `📢 *Fees Overdue Notice — Wisdom Library*
+
+प्रिय ${name},
+
+आपकी लाइब्रेरी फीस *${formattedDueDate}* से बकाया है — यानी *${dueDays} दिन* हो चुके हैं। 📅
+
+We have been sending you regular fee reminders, but unfortunately we have not received any response from your side.
+
+कृपया यह स्पष्ट करें:
+➡️ Do you wish to continue the membership and complete the payment?
+➡️ Or would you like us to discontinue the membership?
+
+Without your confirmation, it becomes difficult for us to proceed further. Kindly reply *today itself* and inform us clearly about your decision.
+
+We truly value your association with *Wisdom Library* and hope for clear communication.
+
+☎️ *Call / WhatsApp:* +91-9425373085
+
+_Kind regards,_  
+*Team Wisdom Library* 📚`;
+
+
+} else if (dueDays > 10) {
     // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
     message = `📢 *Fees Overdue Notice — Wisdom Library*\n\nप्रिय ${name},\n\nआपकी लाइब्रेरी फीस *${formattedDueDate}* से बकाया है — यानी *${dueDays} दिन* हो चुके हैं। 📅\n\nहमने देखा है कि आपके पेमेंट्स में अक्सर देरी हो रही है, इसलिए हम जानना चाहेंगे कि क्या कोई विशेष कारण है? 🤔\n\nकृपया आज ही पेमेंट कर दें या हमें सूचित करें कि कब तक भुगतान संभव होगा। इससे हमें आपकी सदस्यता सुचारू रखने में मदद मिलेगी।\n\nWe truly value your association with *Wisdom Library* and hope to continue serving you with the same warmth and trust. 💫\n\n☎️ *Call/WhatsApp:* +91-9425373085\n\n_Kind regards,_\n*Team Wisdom Library* 📚`;
 
@@ -461,8 +485,31 @@ function openWhatsApp(number, name, dueDateStr) {
 
     // Conditional message
     let message;
+if (dueDays > 11) {
+    // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
+    message = `📢 *Fees Overdue Notice — Wisdom Library*
 
-if (dueDays > 10) {
+Dear ${name},
+
+Your library fee is overdue since ${formattedDueDate} (${dueDays} days).
+
+We have been sending you regular fee reminders, but unfortunately we have not received any response from your side.
+
+Please confirm today:
+➡️ Do you wish to continue the membership and complete the payment?
+➡️ Or would you like us to discontinue the membership?
+
+Without your confirmation, it becomes difficult for us to proceed further. Kindly reply *today itself* and inform us clearly about your decision.
+
+We truly value your association with *Wisdom Library* and hope for clear communication.
+
+☎️ *Call / WhatsApp:* +91-9425373085
+
+_Kind regards,_  
+*Team Wisdom Library* 📚`;
+
+
+} else if (dueDays > 10) {
     // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
     message = `📢 *Fees Overdue Notice — Wisdom Library*\n\nDear ${name},\n\nYour library fee has been *overdue since ${formattedDueDate}* — it’s now been *${dueDays} days*. 📅\n\nWe’ve noticed that your payments have often been delayed, and we’re genuinely concerned. Could you please let us know the reason behind this repeated delay? 🤔\n\nWe don’t like having to remind you again and again — it’s uncomfortable for us too. Please take a moment to respond to this message and make your payment *today itself* to avoid any further inconvenience.\n\nWe truly value your association with *Wisdom Library* and hope to continue serving you with the same warmth and trust. 💫\n\n☎️ *Call/WhatsApp:* +91-9425373085\n\n_Kind regards,_\n*Team Wisdom Library* 📚`;
 
