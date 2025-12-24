@@ -404,6 +404,29 @@ function openSMS(number, name, dueDateStr) {
     const formattedDueDate = `${String(dueDate.getDate()).padStart(2, '0')}-${dueDate.toLocaleString('en-US', { month: 'short' })}-${dueDate.getFullYear()}`;
 
      let message;
+if (dueDays > 11) {
+    // STRICT & PROFESSIONAL REMINDER (11+ days overdue)
+    message = `📢 *Fees Overdue Notice — Wisdom Library*
+
+प्रिय ${name},
+
+आपकी लाइब्रेरी फीस *${formattedDueDate}* से बकाया है — यानी *${dueDays} दिन* हो चुके हैं। 📅
+
+We have been sending you regular fee reminders, but unfortunately we have not received any response from your side.
+
+कृपया यह स्पष्ट करें:
+➡️ Do you wish to continue the membership and complete the payment?
+➡️ Or would you like us to discontinue the membership?
+
+Without your confirmation, it becomes difficult for us to proceed further. Kindly reply *today itself* and inform us clearly about your decision.
+
+We truly value your association with *Wisdom Library* and hope for clear communication.
+
+☎️ *Call / WhatsApp:* +91-9425373085
+
+_Kind regards,_  
+*Team Wisdom Library* 📚`;
+
 
 if (dueDays > 10) {
     // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
@@ -461,6 +484,29 @@ function openWhatsApp(number, name, dueDateStr) {
 
     // Conditional message
     let message;
+if (dueDays > 11) {
+    message = `📢 *Important Notice — Wisdom Library*
+
+Dear ${name},
+
+Your library fee has been pending since *${formattedDueDate}* and is now *${dueDays} days overdue*.
+
+We would like to inform you that *daily fee reminders* have been sent to you, but unfortunately we have not received any response from your side so far.
+
+At this stage, we need a *clear confirmation* from you:
+➡️ Do you wish to continue with the membership and complete the payment?
+➡️ Or would you like us to discontinue the membership?
+
+Without your response, it becomes difficult for us to proceed further. Kindly *reply today* and clearly inform us of your decision so that unnecessary reminders can be stopped.
+
+We request your cooperation and clear communication.
+
+📞 *Call / WhatsApp:* +91-9425373085
+
+_Regards,_  
+*Team Wisdom Library* 📚`;
+}
+
 
 if (dueDays > 10) {
     // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
@@ -1160,7 +1206,6 @@ function openEditModal(seatNo) {
 
   document.getElementById("editModal").style.display = "block";
 }
-
 
 
 
