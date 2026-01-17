@@ -427,7 +427,6 @@ We value your association with *Wisdom Library*, लेकिन फीस स�
 
 _Kind regards,_  
 *Team Wisdom Library* 📚`;
-}
 
 
 } else if (dueDays > 10) {
@@ -509,7 +508,6 @@ We value your association with *Wisdom Library*, लेकिन फीस स�
 
 _Kind regards,_  
 *Team Wisdom Library* 📚`;
-}
 
 } else if (dueDays > 10) {
   // 🔥 10+ days — STRICT & PROFESSIONAL
@@ -1291,6 +1289,7 @@ function openEditModal(seatNo) {
 
   document.getElementById("editModal").style.display = "block";
 }
+
 
 
 
