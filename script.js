@@ -406,28 +406,27 @@ function openSMS(number, name, dueDateStr) {
      let message;
 
 if (dueDays > 11) {
-    // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
-    message = `📢 *Fees Overdue Notice — Wisdom Library*
+  📢 *Fees Reminder — Wisdom Library*
 
 प्रिय ${name},
 
 आपकी लाइब्रेरी फीस *${formattedDueDate}* से बकाया है — यानी *${dueDays} दिन* हो चुके हैं। 📅
 
-We have been sending you regular fee reminders, but unfortunately we have not received any response from your side.
+यदि आपने **payment कर दी है**, तो कृपया उसका **screenshot तुरंत भेजें** 📸  
+और यदि अभी तक **payment नहीं की है**, तो कृपया **यह स्पष्ट करें कि आप किस तारीख को fees जमा कर देंगे**।
 
-कृपया यह स्पष्ट करें:
-➡️ Do you wish to continue the membership and complete the payment?
-➡️ Or would you like us to discontinue the membership?
+आपको **रोज़ fees reminder** भेजे जा रहे हैं, लेकिन हमें आपकी तरफ़ से **कोई जवाब नहीं मिल रहा**।  
+बार-बार पूछना अच्छा नहीं लगता, इसलिए कृपया **एक बार confirm कर दें कि आप किस date को fees जमा करेंगे**, ताकि हमें clarity मिल सके।
 
-Without your confirmation, it becomes difficult for us to proceed further. Kindly reply *today itself* and inform us clearly about your decision.
+जैसे ही आप तारीख confirm करेंगे, **हम उसी दिन आपसे संपर्क करेंगे** ।  
+ कृपया **fees समय पर जमा किया करें**, क्योंकि बार-बार याद दिलाना न तो आपको अच्छा लगता है और न हमें।
 
-We truly value your association with *Wisdom Library* and hope for clear communication.
+We value your association with *Wisdom Library*, लेकिन फीस से जुड़ी ज़िम्मेदारी निभाना भी उतना ही ज़रूरी है।
 
-☎️ *Call / WhatsApp:* +91-9425373085
+☎️ *Call/WhatsApp:* +91-9425373085
 
 _Kind regards,_  
-*Team Wisdom Library* 📚`;
-
+*Team Wisdom Library* 📚
 
 } else if (dueDays > 10) {
     // STRICT & PROFESSIONAL REMINDER (10+ days overdue)
@@ -487,30 +486,27 @@ function openWhatsApp(number, name, dueDateStr) {
    let message;
 
 if (dueDays > 11) {
-  // 🔥 11+ days — FINAL STRICT NOTICE
-  message = `🚨⚠️📢 *FINAL OVERDUE NOTICE — WISDOM LIBRARY* 📢⚠️🚨
+  📢 *Fees Reminder — Wisdom Library*
 
-Dear ${name} 🙏😐,
+प्रिय ${name},
 
-Your library fee has been *overdue since 📅 ${formattedDueDate}*  
-⏳ *Total overdue: ${dueDays} DAYS* ❗❗❗
+आपकी लाइब्रेरी फीस *${formattedDueDate}* से बकाया है — यानी *${dueDays} दिन* हो चुके हैं। 📅
 
-💌 We have sent you *multiple reminders* 📨🔔, but so far we have *not received any response* 😟📭.
+यदि आपने **payment कर दी है**, तो कृपया उसका **screenshot तुरंत भेजें** 📸  
+और यदि अभी तक **payment नहीं की है**, तो कृपया **यह स्पष्ट करें कि आप किस तारीख को fees जमा कर देंगे**।
 
-‼️ Kindly confirm *TODAY ITSELF* 👇👇
+आपको **रोज़ fees reminder** भेजे जा रहे हैं, लेकिन हमें आपकी तरफ़ से **कोई जवाब नहीं मिल रहा**।  
+बार-बार पूछना अच्छा नहीं लगता, इसलिए कृपया **एक बार confirm कर दें कि आप किस date को fees जमा करेंगे**, ताकि हमें clarity मिल सके।
 
-➡️ 💳✅ Do you wish to *continue your membership* and complete the payment?  
-➡️ ⛔📕 Or would you like us to *discontinue the membership*?
+जैसे ही आप तारीख confirm करेंगे, **हम उसी दिन आपसे संपर्क करेंगे** ।  
+ कृपया **fees समय पर जमा किया करें**, क्योंकि बार-बार याद दिलाना न तो आपको अच्छा लगता है और न हमें।
 
-⚠️ *Without your confirmation, we cannot proceed further* 😕🛑.  
-🙏 Please reply *TODAY* ⏰📲 and let us know your decision clearly 📝✔️.
+We value your association with *Wisdom Library*, लेकिन फीस से जुड़ी ज़िम्मेदारी निभाना भी उतना ही ज़रूरी है।
 
-💖✨ We truly value your association with *📚 Wisdom Library* and hope for your prompt response 🤝🌟.
-
-📲☎️ *Call / WhatsApp:* +91-9425373085
+☎️ *Call/WhatsApp:* +91-9425373085
 
 _Kind regards,_  
-*Team Wisdom Library* 📚🔥💯`;
+*Team Wisdom Library* 📚
   
 } else if (dueDays > 10) {
   // 🔥 10+ days — STRICT & PROFESSIONAL
@@ -1292,6 +1288,7 @@ function openEditModal(seatNo) {
 
   document.getElementById("editModal").style.display = "block";
 }
+
 
 
 
