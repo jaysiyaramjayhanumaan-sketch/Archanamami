@@ -417,7 +417,8 @@ if (dueDays > 11) {
 
 आपको **रोज़ fees reminder** भेजे जा रहे हैं, लेकिन हमें आपकी तरफ़ से **कोई जवाब नहीं मिल रहा**।  
 बार-बार पूछना अच्छा नहीं लगता, इसलिए कृपया **एक बार confirm कर दें कि आप किस date को fees जमा करेंगे**, ताकि हमें clarity मिल सके।
-
+
+
 कृपया **fees समय पर जमा किया करें**, क्योंकि बार-बार याद दिलाना न तो आपको अच्छा लगता है और न हमें।
 
 We value your association with *Wisdom Library*, लेकिन फीस से जुड़ी ज़िम्मेदारी निभाना भी उतना ही ज़रूरी है।
@@ -497,7 +498,8 @@ if (dueDays > 11) {
 
 आपको **रोज़ fees reminder** भेजे जा रहे हैं, लेकिन हमें आपकी तरफ़ से **कोई जवाब नहीं मिल रहा**।  
 बार-बार पूछना अच्छा नहीं लगता, इसलिए कृपया **एक बार confirm कर दें कि आप किस date को fees जमा करेंगे**, ताकि हमें clarity मिल सके।
- 
+
+ 
 कृपया **fees समय पर जमा किया करें**, क्योंकि बार-बार याद दिलाना न तो आपको अच्छा लगता है और न हमें।
 
 We value your association with *Wisdom Library*, लेकिन फीस से जुड़ी ज़िम्मेदारी निभाना भी उतना ही ज़रूरी है।
@@ -1056,6 +1058,143 @@ var blob = doc.output("blob");
 downloadBlob(blob, "wisdom-library-seat-report.pdf");
 
 }
+
+async function downloadSeatPhotoPDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF("landscape", "mm", "a4");
+
+    // Only filled seats
+    const filledSeats = seats.filter(
+        s => s.name && s.name.trim() !== ""
+    );
+
+    // Load photos
+    const photos = await Promise.all(
+        filledSeats.map(seat => {
+
+            return new Promise(resolve => {
+
+                if (!seat.photo ||
+                    !seat.photo.startsWith("data:image/")) {
+                    resolve(null);
+                    return;
+                }
+
+                const img = new Image();
+
+                img.onload = function() {
+
+                    const canvas = document.createElement("canvas");
+
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+
+                    resolve(
+                        canvas.toDataURL("image/jpeg", 0.85)
+                    );
+                };
+
+                img.onerror = () => resolve(null);
+
+                img.src = seat.photo;
+
+            });
+
+        })
+    );
+
+    // Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+
+    doc.text(
+        "Wisdom Library Student Photo Report",
+        148,
+        15,
+        { align: "center" }
+    );
+
+    // Table
+    doc.autoTable({
+
+        startY: 25,
+
+        head: [[
+            "Seat No.",
+            "Photo",
+            "Fees",
+            "Admission Date"
+        ]],
+
+        body: filledSeats.map(s => [
+            s.seatNo,
+            "",
+            s.fees || "",
+            s.admissionDate || ""
+        ]),
+
+        theme: "grid",
+
+        styles: {
+            font: "helvetica",
+            fontSize: 11,
+            halign: "center",
+            valign: "middle",
+            minCellHeight: 28
+        },
+
+        headStyles: {
+            fillColor: [0, 102, 204],
+            textColor: [255, 255, 255],
+            fontStyle: "bold"
+        },
+
+        columnStyles: {
+            0: { cellWidth: 40 },
+            1: { cellWidth: 50 },
+            2: { cellWidth: 45 },
+            3: { cellWidth: 55 }
+        },
+
+        didDrawCell: function(data) {
+
+            if (
+                data.section === "body" &&
+                data.column.index === 1
+            ) {
+
+                const photo = photos[data.row.index];
+
+                if (photo) {
+
+                    doc.addImage(
+                        photo,
+                        "JPEG",
+                        data.cell.x + 5,
+                        data.cell.y + 3,
+                        20,
+                        22
+                    );
+                }
+            }
+        }
+    });
+
+    // Download
+    const blob = doc.output("blob");
+
+    downloadBlob(
+        blob,
+        "wisdom-library-photo-report.pdf"
+    );
+
+}
+
 function downloadBlob(blob, filename) {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
