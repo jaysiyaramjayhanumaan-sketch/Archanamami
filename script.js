@@ -1344,7 +1344,146 @@ async function downloadSeatPhotoPDF() {
 }
 
 
+async function downloadOnlyPhotoPDF() {
 
+    const { jsPDF } = window.jspdf;
+
+    // A4 Landscape PDF for bigger photos
+    const doc = new jsPDF("landscape", "mm", "a4");
+
+    // Only filled seats
+    const filledSeats = seats.filter(
+        s => s.name && s.name.trim() !== ""
+    );
+
+    // Load photos
+    const photos = await Promise.all(
+        filledSeats.map(seat => {
+
+            return new Promise(resolve => {
+
+                if (
+                    !seat.photo ||
+                    !seat.photo.startsWith("data:image/")
+                ) {
+                    resolve(null);
+                    return;
+                }
+
+                const img = new Image();
+
+                img.onload = function() {
+
+                    const canvas = document.createElement("canvas");
+
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+
+                    const ctx = canvas.getContext("2d");
+
+                    ctx.drawImage(img, 0, 0);
+
+                    resolve(
+                        canvas.toDataURL("image/jpeg", 0.90)
+                    );
+                };
+
+                img.onerror = () => resolve(null);
+
+                img.src = seat.photo;
+
+            });
+
+        })
+    );
+
+    // Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+
+    doc.text(
+        "Wisdom Library Student Photo List",
+        148,
+        15,
+        { align: "center" }
+    );
+
+    // Table
+    doc.autoTable({
+
+        startY: 25,
+
+        head: [[
+            "Seat No.",
+            "Name",
+            "Photo"
+        ]],
+
+        body: filledSeats.map(s => [
+            s.seatNo,
+            s.name || "",
+            ""
+        ]),
+
+        theme: "grid",
+
+        styles: {
+            font: "helvetica",
+            fontSize: 12,
+            halign: "center",
+            valign: "middle",
+            minCellHeight: 45
+        },
+
+        headStyles: {
+            fillColor: [0, 102, 204],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+            fontSize: 13
+        },
+
+        columnStyles: {
+            0: { cellWidth: 30 },
+            1: { cellWidth: 65 },
+            2: { cellWidth: 100 }
+        },
+
+        didDrawCell: function(data) {
+
+            // Photo column
+            if (
+                data.section === "body" &&
+                data.column.index === 2
+            ) {
+
+                const photo = photos[data.row.index];
+
+                if (photo) {
+
+                    doc.addImage(
+                        photo,
+                        "JPEG",
+                        data.cell.x + 25,
+                        data.cell.y + 2,
+                        50,
+                        40
+                    );
+
+                }
+            }
+        }
+
+    });
+
+    // Download PDF
+    const blob = doc.output("blob");
+
+    downloadBlob(
+        blob,
+        "wisdom-library-student-photos.pdf"
+    );
+
+}
 
 function downloadBlob(blob, filename) {
     const link = document.createElement("a");
