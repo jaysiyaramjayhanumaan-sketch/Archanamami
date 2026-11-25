@@ -944,120 +944,261 @@ document.addEventListener("DOMContentLoaded", function () {
     const observer = new MutationObserver(attachWhatsAppHandlers);
     observer.observe(document.body, { childList: true, subtree: true });
 });
-function downloadPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
 
-    // ✅ Use seats from localStorage / current array
-   const rows = seats
-    .filter(s => s.name && s.name.trim() !== "")  // sirf filled seats
-    .map(s => [
-        s.seatNo,
-        s.name,
-        s.mobile,
-        s.admissionDate,
-        s.dueDate,
-        s.fees,
-        s.months  // ✅ Correct field
+
+async function downloadPDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    // Landscape PDF
+    const doc = new jsPDF("landscape", "mm", "a4");
+
+    // Only filled seats
+    const filledSeats = seats.filter(
+        s => s.name && s.name.trim() !== ""
+    );
+
+    // Convert saved photo into JPEG for PDF
+    async function preparePhoto(src) {
+
+        if (!src || !src.startsWith("data:image/")) {
+            return null;
+        }
+
+        return new Promise(resolve => {
+
+            const img = new Image();
+
+            img.onload = function() {
+
+                try {
+                    const canvas = document.createElement("canvas");
+
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+
+                    const ctx = canvas.getContext("2d");
+
+                    ctx.drawImage(img, 0, 0);
+
+                    resolve(
+                        canvas.toDataURL("image/jpeg", 0.85)
+                    );
+
+                } catch (error) {
+                    console.log("Photo conversion error:", error);
+                    resolve(null);
+                }
+            };
+
+            img.onerror = function() {
+                console.log("Photo loading failed:", src.substring(0, 50));
+                resolve(null);
+            };
+
+            img.src = src;
+        });
+    }
+
+    // Prepare all photos before creating table
+    const photos = await Promise.all(
+        filledSeats.map(seat => preparePhoto(seat.photo))
+    );
+
+    // Table rows
+    const rows = filledSeats.map(s => [
+        s.seatNo || "",
+        s.name || "",
+        s.mobile || "",
+        s.admissionDate || "",
+        s.dueDate || "",
+        s.fees || "",
+        s.months || "",
+        "" // Photo column
     ]);
 
+    // Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(40, 40, 40);
 
-// Report Title
-doc.setFont("helvetica", "bold");
-doc.setFontSize(18);
-doc.setTextColor(40, 40, 40);
-doc.text("Wisdom Library Seat Report", doc.internal.pageSize.getWidth() / 2, 15, { align: "center" });
+    doc.text(
+        "Wisdom Library Seat Report",
+        doc.internal.pageSize.getWidth() / 2,
+        15,
+        { align: "center" }
+    );
 
- // Table Generation
-doc.autoTable({
-    startY: 25,
-   head: [["Seat No", "Name", "Mobile", "Admission Date", "Due Date", "Fees", "Months"]],
+    // Generate Table
+    doc.autoTable({
 
-body: rows, // Make sure `rows` is a 2D array of string or number values
-    theme: 'grid',
+        startY: 25,
 
-    styles: {
-        fontSize: 11,
-        font: "helvetica",
-        halign: 'center',
-        textColor: 20,
-    },
+        head: [[
+            "Seat No",
+            "Name",
+            "Mobile",
+            "Admission Date",
+            "Due Date",
+            "Fees",
+            "Months",
+            "Photo"
+        ]],
 
-    headStyles: {
-        fillColor: [0, 102, 204],  // Blue background
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
-        halign: 'center',
-    },
+        body: rows,
 
-    bodyStyles: {
-        fontStyle: "normal",
-    },
+        theme: "grid",
 
-    alternateRowStyles: {
-        fillColor: [245, 245, 245], // Light gray for alternate rows
-    },
+        margin: {
+            left: 10,
+            right: 10,
+            bottom: 30
+        },
 
-    didDrawPage: function (data) {
-        const pageSize = doc.internal.pageSize;
-        const pageHeight = pageSize.height || doc.internal.pageSize.getHeight();
-        const pageWidth = pageSize.width || doc.internal.pageSize.getWidth();
-        const pageCount = doc.internal.getNumberOfPages();
-        const pageCurrent = data.pageNumber;
+        styles: {
+            font: "helvetica",
+            fontSize: 9,
+            halign: "center",
+            valign: "middle",
+            textColor: 20,
+            minCellHeight: 25
+        },
 
-        // Page number at bottom center
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(100);
-        doc.text(`Page ${pageCurrent} of ${pageCount}`, pageWidth / 2, pageHeight - 5, { align: "center" });
-    }
-});
+        headStyles: {
+            fillColor: [0, 102, 204],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+            halign: "center"
+        },
 
-// === Summary Section (Last Page Only) ===
+        alternateRowStyles: {
+            fillColor: [245, 245, 245]
+        },
 
-const totalSeats = rows.length;
-const totalFees = rows.reduce((sum, r) => {
-    let fee = Number(r[5]);
-    return sum + (isNaN(fee) ? 0 : fee);
-}, 0);
+        columnStyles: {
+            0: { cellWidth: 18 },
+            1: { cellWidth: 40 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 32 },
+            4: { cellWidth: 32 },
+            5: { cellWidth: 22 },
+            6: { cellWidth: 20 },
+            7: { cellWidth: 30 }
+        },
 
-// Move to last page (in case there are multiple pages)
-const totalPages = doc.internal.getNumberOfPages();
-doc.setPage(totalPages);
+        // IMPORTANT: Draw actual student photo
+        didDrawCell: function(data) {
 
-// Draw Summary Box
-const pageSize = doc.internal.pageSize;
-const pageWidth = pageSize.width || doc.internal.pageSize.getWidth();
-const pageHeight = pageSize.height || doc.internal.pageSize.getHeight();
+            if (
+                data.section === "body" &&
+                data.column.index === 7
+            ) {
 
-const boxX = 14;
-const boxY = pageHeight - 25;
-const boxWidth = pageWidth - 28;
-const boxHeight = 14;
+                const photo = photos[data.row.index];
 
-// Green background box
-doc.setFillColor(0, 153, 51);  // Green
-doc.rect(boxX, boxY, boxWidth, boxHeight, 'F');
+                if (photo) {
 
-// Summary Text
-doc.setTextColor(255, 255, 255); // White
-doc.setFont("helvetica", "bold");
-doc.setFontSize(12);
-doc.text(
-    `Total Seats Filled: ${totalSeats} | Total Fees Collected: ${totalFees}`,
-    pageWidth / 2,
-    boxY + 9,
-    { align: "center" }
-);
+                    try {
 
+                        const imgWidth = 19;
+                        const imgHeight = 19;
 
-// Download PDF
-    // Blob बनाओ
-var blob = doc.output("blob");
-// ✅ अब AndroidBridge से save करवाओ
-downloadBlob(blob, "wisdom-library-seat-report.pdf");
+                        const x = data.cell.x +
+                            (data.cell.width - imgWidth) / 2;
 
+                        const y = data.cell.y +
+                            (data.cell.height - imgHeight) / 2;
+
+                        doc.addImage(
+                            photo,
+                            "JPEG",
+                            x,
+                            y,
+                            imgWidth,
+                            imgHeight
+                        );
+
+                    } catch (error) {
+
+                        console.log(
+                            "PDF photo error:",
+                            error
+                        );
+
+                    }
+                }
+            }
+        },
+
+        // Page Number
+        didDrawPage: function(data) {
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(100);
+
+            doc.text(
+                "Page " + data.pageNumber,
+                pageWidth / 2,
+                pageHeight - 8,
+                { align: "center" }
+            );
+        }
+    });
+
+    // Summary
+    const totalSeats = rows.length;
+
+    const totalFees = rows.reduce((sum, r) => {
+        const fee = Number(r[5]);
+        return sum + (isNaN(fee) ? 0 : fee);
+    }, 0);
+
+    // Last page
+    const totalPages = doc.internal.getNumberOfPages();
+
+    doc.setPage(totalPages);
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const boxX = 10;
+    const boxY = pageHeight - 25;
+    const boxWidth = pageWidth - 20;
+
+    doc.setFillColor(0, 153, 51);
+
+    doc.rect(
+        boxX,
+        boxY,
+        boxWidth,
+        14,
+        "F"
+    );
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+
+    doc.text(
+        `Total Seats Filled: ${totalSeats} | Total Fees Collected: ${totalFees}`,
+        pageWidth / 2,
+        boxY + 9,
+        { align: "center" }
+    );
+
+    // Download
+    const blob = doc.output("blob");
+
+    downloadBlob(
+        blob,
+        "wisdom-library-seat-report.pdf"
+    );
 }
+
 
 async function downloadSeatPhotoPDF() {
 
@@ -1126,15 +1267,19 @@ async function downloadSeatPhotoPDF() {
 
         head: [[
             "Seat No.",
+            "Name",
             "Photo",
             "Fees",
+            "Due Date",
             "Admission Date"
         ]],
 
         body: filledSeats.map(s => [
             s.seatNo,
+            s.name || "",
             "",
             s.fees || "",
+            s.dueDate || "",
             s.admissionDate || ""
         ]),
 
@@ -1142,7 +1287,7 @@ async function downloadSeatPhotoPDF() {
 
         styles: {
             font: "helvetica",
-            fontSize: 11,
+            fontSize: 10,
             halign: "center",
             valign: "middle",
             minCellHeight: 28
@@ -1155,17 +1300,20 @@ async function downloadSeatPhotoPDF() {
         },
 
         columnStyles: {
-            0: { cellWidth: 40 },
-            1: { cellWidth: 50 },
-            2: { cellWidth: 45 },
-            3: { cellWidth: 55 }
+            0: { cellWidth: 25 },
+            1: { cellWidth: 45 },
+            2: { cellWidth: 35 },
+            3: { cellWidth: 30 },
+            4: { cellWidth: 35 },
+            5: { cellWidth: 40 }
         },
 
         didDrawCell: function(data) {
 
+            // Photo column index is now 2
             if (
                 data.section === "body" &&
-                data.column.index === 1
+                data.column.index === 2
             ) {
 
                 const photo = photos[data.row.index];
@@ -1175,7 +1323,7 @@ async function downloadSeatPhotoPDF() {
                     doc.addImage(
                         photo,
                         "JPEG",
-                        data.cell.x + 5,
+                        data.cell.x + 7,
                         data.cell.y + 3,
                         20,
                         22
@@ -1194,6 +1342,9 @@ async function downloadSeatPhotoPDF() {
     );
 
 }
+
+
+
 
 function downloadBlob(blob, filename) {
     const link = document.createElement("a");
@@ -1426,7 +1577,6 @@ function openEditModal(seatNo) {
 
   document.getElementById("editModal").style.display = "block";
 }
-
 
 
 
