@@ -1200,146 +1200,236 @@ async function downloadPDF() {
 }
 
 
-async function downloadSeatPhotoPDF() {
 
-    const { jsPDF } = window.jspdf;
+async function downloadOnlyPhotoPDF() {
 
-    const doc = new jsPDF("landscape", "mm", "a4");
+    try {
 
-    // Only filled seats
-    const filledSeats = seats.filter(
-        s => s.name && s.name.trim() !== ""
-    );
+        const { jsPDF } = window.jspdf;
 
-    // Load photos
-    const photos = await Promise.all(
-        filledSeats.map(seat => {
+        // Create A4 Landscape PDF
+        const doc = new jsPDF("landscape", "mm", "a4");
 
-            return new Promise(resolve => {
+        // Only filled seats
+        const filledSeats = seats.filter(
+            s => s.name && s.name.trim() !== ""
+        );
 
-                if (!seat.photo ||
-                    !seat.photo.startsWith("data:image/")) {
-                    resolve(null);
-                    return;
-                }
-
-                const img = new Image();
-
-                img.onload = function() {
-
-                    const canvas = document.createElement("canvas");
-
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
-
-                    const ctx = canvas.getContext("2d");
-                    ctx.drawImage(img, 0, 0);
-
-                    resolve(
-                        canvas.toDataURL("image/jpeg", 0.85)
-                    );
-                };
-
-                img.onerror = () => resolve(null);
-
-                img.src = seat.photo;
-
-            });
-
-        })
-    );
-
-    // Title
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-
-    doc.text(
-        "Wisdom Library Student Photo Report",
-        148,
-        15,
-        { align: "center" }
-    );
-
-    // Table
-    doc.autoTable({
-
-        startY: 25,
-
-        head: [[
-            "Seat No.",
-            "Name",
-            "Photo",
-            "Fees",
-            "Due Date",
-            "Admission Date"
-        ]],
-
-        body: filledSeats.map(s => [
-            s.seatNo,
-            s.name || "",
-            "",
-            s.fees || "",
-            s.dueDate || "",
-            s.admissionDate || ""
-        ]),
-
-        theme: "grid",
-
-        styles: {
-            font: "helvetica",
-            fontSize: 10,
-            halign: "center",
-            valign: "middle",
-            minCellHeight: 28
-        },
-
-        headStyles: {
-            fillColor: [0, 102, 204],
-            textColor: [255, 255, 255],
-            fontStyle: "bold"
-        },
-
-        columnStyles: {
-            0: { cellWidth: 25 },
-            1: { cellWidth: 45 },
-            2: { cellWidth: 35 },
-            3: { cellWidth: 30 },
-            4: { cellWidth: 35 },
-            5: { cellWidth: 40 }
-        },
-
-        didDrawCell: function(data) {
-
-            // Photo column index is now 2
-            if (
-                data.section === "body" &&
-                data.column.index === 2
-            ) {
-
-                const photo = photos[data.row.index];
-
-                if (photo) {
-
-                    doc.addImage(
-                        photo,
-                        "JPEG",
-                        data.cell.x + 7,
-                        data.cell.y + 3,
-                        20,
-                        22
-                    );
-                }
-            }
+        if (filledSeats.length === 0) {
+            alert("No student records found!");
+            return;
         }
-    });
 
-    // Download
-    const blob = doc.output("blob");
+        // Load student photos
+        const photos = await Promise.all(
+            filledSeats.map(seat => {
 
-    downloadBlob(
-        blob,
-        "wisdom-library-photo-report.pdf"
-    );
+                return new Promise(resolve => {
+
+                    if (
+                        !seat.photo ||
+                        !seat.photo.startsWith("data:image/")
+                    ) {
+                        resolve(null);
+                        return;
+                    }
+
+                    const img = new Image();
+
+                    img.onload = function() {
+
+                        try {
+
+                            const canvas = document.createElement("canvas");
+
+                            canvas.width = img.naturalWidth;
+                            canvas.height = img.naturalHeight;
+
+                            const ctx = canvas.getContext("2d");
+
+                            ctx.drawImage(img, 0, 0);
+
+                            resolve(
+                                canvas.toDataURL("image/jpeg", 0.90)
+                            );
+
+                        } catch (error) {
+                            console.error("Photo conversion error:", error);
+                            resolve(null);
+                        }
+
+                    };
+
+                    img.onerror = function() {
+                        resolve(null);
+                    };
+
+                    img.src = seat.photo;
+
+                });
+
+            })
+        );
+
+        // PDF Title
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+
+        doc.text(
+            "Wisdom Library Student Photo List",
+            148.5,
+            15,
+            { align: "center" }
+        );
+
+        // Student Photo Table
+        doc.autoTable({
+
+            startY: 25,
+
+            head: [[
+                "Seat No.",
+                "Student Name",
+                "Photo"
+            ]],
+
+            body: filledSeats.map(s => [
+                s.seatNo,
+                s.name || "",
+                ""
+            ]),
+
+            theme: "grid",
+
+            margin: {
+                left: 10,
+                right: 10
+            },
+
+            styles: {
+                font: "helvetica",
+                fontSize: 12,
+                halign: "center",
+                valign: "middle",
+                minCellHeight: 42,
+                cellPadding: 3
+            },
+
+            headStyles: {
+                fillColor: [0, 102, 204],
+                textColor: [255, 255, 255],
+                fontStyle: "bold",
+                fontSize: 13
+            },
+
+            columnStyles: {
+                0: {
+                    cellWidth: 30
+                },
+
+                1: {
+                    cellWidth: 65
+                },
+
+                2: {
+                    cellWidth: 172
+                }
+            },
+
+            didDrawCell: function(data) {
+
+                // Draw photos in photo column
+                if (
+                    data.section === "body" &&
+                    data.column.index === 2
+                ) {
+
+                    const photo = photos[data.row.index];
+
+                    if (photo) {
+
+                        const imgWidth = 35;
+                        const imgHeight = 35;
+
+                        const x =
+                            data.cell.x +
+                            (data.cell.width - imgWidth) / 2;
+
+                        const y =
+                            data.cell.y +
+                            (data.cell.height - imgHeight) / 2;
+
+                        doc.addImage(
+                            photo,
+                            "JPEG",
+                            x,
+                            y,
+                            imgWidth,
+                            imgHeight
+                        );
+
+                    } else {
+
+                        doc.setFontSize(10);
+                        doc.setTextColor(150, 150, 150);
+
+                        doc.text(
+                            "No Photo",
+                            data.cell.x + data.cell.width / 2,
+                            data.cell.y + data.cell.height / 2,
+                            { align: "center" }
+                        );
+
+                    }
+
+                }
+
+            }
+
+        });
+
+        // Download PDF
+        const blob = doc.output("blob");
+
+        downloadBlob(
+            blob,
+            "wisdom-library-student-photos.pdf"
+        );
+
+    } catch (error) {
+
+        console.error("PDF Error:", error);
+
+        alert(
+            "PDF download failed! Please check browser console."
+        );
+
+    }
+
+}
+
+
+// Download Blob Function
+function downloadBlob(blob, filename) {
+
+    const link = document.createElement("a");
+
+    const url = URL.createObjectURL(blob);
+
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    setTimeout(() => {
+
+        URL.revokeObjectURL(url);
+
+    }, 1000);
 
 }
 
